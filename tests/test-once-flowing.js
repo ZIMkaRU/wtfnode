@@ -5,9 +5,9 @@ var wtf = require('../index');
 var PassThrough = require('stream').PassThrough,
     assert = require('assert');
 
-var stream = new PassThrough();
 
 (function () {
+    var stream = new PassThrough();
     var count = 0;
     stream.once('data', function () {
         count++;
@@ -19,8 +19,9 @@ var stream = new PassThrough();
 })();
 
 (function () {
+    var stream = new PassThrough();
     var count = 0;
-    stream.on('data', function () {
+    stream.on('data', function (a) {
         count++;
     });
     stream.write('foo');
