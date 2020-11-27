@@ -365,24 +365,26 @@ function setupAsyncHooks() {
     var _cluster_fork = cluster.fork;
     cluster.fork = function (/*env*/) {
         var worker = _cluster_fork.apply(this, arguments);
-
         // we get an open handle for a pipe, but no reference to the
         // worker itself, so we add one, as well as the call site info
-        if (worker && worker.process && worker.process._channel) {
-            Object.defineProperties(worker.process._channel, {
-                __callSite: {
-                    enumerable: false,
-                    configurable: false,
-                    writable: false,
-                    value: findCallsite(getStack())
-                },
-                __worker: {
-                    enumerable: false,
-                    configurable: false,
-                    writable: false,
-                    value: worker
-                }
-            });
+        if (worker && worker.process) {
+            var channel = worker.process.channel || worker.process._channel;
+            if (!channel.hasOwnProperty('__callSite')) {
+                Object.defineProperties(worker.process._channel, {
+                    __callSite: {
+                        enumerable: false,
+                        configurable: false,
+                        writable: false,
+                        value: findCallsite(getStack())
+                    },
+                    __worker: {
+                        enumerable: false,
+                        configurable: false,
+                        writable: false,
+                        value: worker
+                    }
+                });
+            }
         }
 
         return worker;
